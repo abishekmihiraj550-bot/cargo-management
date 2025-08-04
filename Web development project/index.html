@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cargo Management System</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --secondary-color: #2c3e50;
+      --success-color: #2ecc71;
+      --warning-color: #f39c12;
+      --danger-color: #e74c3c;
+      --light-color: #ecf0f1;
+      --dark-color: #34495e;
+      --text-color: #333;
+      --text-light: #7f8c8d;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f7fa;
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    
+    header {
+      background-color: var(--secondary-color);
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    nav ul {
+      display: flex;
+      list-style: none;
+    }
+    
+    nav ul li {
+      margin-left: 1rem;
+    }
+    
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    nav ul li a:hover, nav ul li a.active {
+      background-color: var(--primary-color);
+    }
+    
+    nav ul li a i {
+      font-size: 0.9rem;
+    }
+    
+    main {
+      padding: 1.5rem;
+      min-height: calc(100vh - 68px);
+    }
+    
+    .view {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .view.active {
+      display: block;
+    }
+    
+    h2 {
+      color: var(--secondary-color);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--light-color);
+    }
+    
+    /* Dashboard Styles */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card h3 {
+      margin-bottom: 1rem;
+      color: var(--secondary-color);
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .stat-card {
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin: 0.5rem 0;
+    }
+    
+    .stat-label {
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+    
+    .quick-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    
+    .btn {
+      padding: 0.8rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #2980b9;
+    }
+    
+    .btn-secondary {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #1a252f;
+    }
+    
+    .btn-success {
+      background-color: var(--success-color);
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background-color: #27ae60;
+    }
+    
+    .btn-warning {
+      background-color: var(--warning-color);
+      color: white;
+    }
+    
+    .btn-warning:hover {
+      background-color: #e67e22;
+    }
+    
+    .btn-danger {
+      background-color: var(--danger-color);
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background-color: #c0392b;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    th {
+      background-color: #f8f9fa;
+      font-weight: bold;
+      color: var(--secondary-color);
+    }
+    
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .status {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      display: inline-block;
+    }
+    
+    .status-pending {
+      background-color: #f1c40f;
+      color: #000;
+    }
+    
+    .status-in-transit {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .status-delivered {
+      background-color: var(--success-color);
+      color: white;
+    }
+    
+    .status-delayed {
+      background-color: var(--danger-color);
+      color: white;
+    }
+    
+    .status-warehouse {
+      background-color: var(--warning-color);
+      color: white;
+    }
+    
+    .search-container {
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .search-input {
+      padding: 0.8rem;
+      flex: 1;
+      max-width: 400px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      transition: border 0.3s;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+    
+    #map-container {
+      height: 400px;
+      background-color: #eee;
+      margin-bottom: 1.5rem;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .map-placeholder {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      color: var(--text-light);
+    }
+    
+    /* Form Styles */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      transition: border 0.3s;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+    
+    textarea.form-control {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    /* Tracking Timeline */
+    .timeline {
+      position: relative;
+      padding-left: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: var(--primary-color);
+    }
+    
+    .timeline-item {
+      position: relative;
+      margin-bottom: 1.5rem;
+      padding-left: 1.5rem;
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 14px;
+      height: 14px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+    }
+    
+    .timeline-date {
+      font-weight: bold;
+      color: var(--secondary-color);
+    }
+    
+    .timeline-content {
+      margin-top: 0.5rem;
+    }
+    
+    /* Notification Center */
+    .notification-item {
+      padding: 1rem;
+      border-left: 4px solid var(--primary-color);
+      background-color: white;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .notification-item.alert {
+      border-left-color: var(--danger-color);
+    }
+    
+    .notification-item.warning {
+      border-left-color: var(--warning-color);
+    }
+    
+    .notification-item.success {
+      border-left-color: var(--success-color);
+    }
+    
+    .notification-icon {
+      font-size: 1.2rem;
+    }
+    
+    .notification-content {
+      flex: 1;
+    }
+    
+    .notification-time {
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      nav ul {
+        margin-top: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      nav ul li {
+        margin: 0.3rem;
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><i class="fas fa-boxes"></i> Cargo Management System</h1>
+    <nav>
+      <ul>
+        <li><a href="#" onclick="showView('dashboard')" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="#" onclick="showView('addCargo')"><i class="fas fa-plus-circle"></i> Add Cargo</a></li>
+        <li><a href="#" onclick="showView('viewCargo')"><i class="fas fa-list"></i> View Cargo</a></li>
+        <li><a href="#" onclick="showView('trackShipment')"><i class="fas fa-search-location"></i> Track Shipment</a></li>
+        <li><a href="#" onclick="showView('warehouse')"><i class="fas fa-warehouse"></i> Warehouse</a></li>
+        <li><a href="#" onclick="showView('notifications')"><i class="fas fa-bell"></i> Notifications</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Dashboard View -->
+    <section id="dashboard" class="view active">
+      <h2><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h2>
+      
+      <div class="dashboard-grid">
+        <!-- Summary Statistics -->
+        <div class="card stat-card">
+          <h3><i class="fas fa-box"></i> Total Shipments Today</h3>
+          <div class="stat-value">142</div>
+          <div class="stat-label">+8% from yesterday</div>
+        </div>
+        
+        <div class="card stat-card">
+          <h3><i class="fas fa-truck"></i> In Transit</h3>
+          <div class="stat-value">87</div>
+          <div class="stat-label">Active shipments</div>
+        </div>
+        
+        <div class="card stat-card">
+          <h3><i class="fas fa-check-circle"></i> Delivered</h3>
+          <div class="stat-value">52</div>
+          <div class="stat-label">Today</div>
+        </div>
+        
+        <div class="card stat-card">
+          <h3><i class="fas fa-exclamation-triangle"></i> Delayed</h3>
+          <div class="stat-value">3</div>
+          <div class="stat-label">Require attention</div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card">
+          <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+          <div class="quick-actions">
+            <button class="btn btn-primary" onclick="showView('addCargo')"><i class="fas fa-plus"></i> Create New Shipment</button>
+            <button class="btn btn-secondary"><i class="fas fa-file-export"></i> Generate Report</button>
+            <button class="btn btn-success"><i class="fas fa-calendar-plus"></i> Schedule Pickup</button>
+          </div>
+        </div>
+        
+        <!-- Revenue Summary -->
+        <div class="card">
+          <h3><i class="fas fa-chart-line"></i> Revenue Summary</h3>
+          <div class="stat-value">$24,580</div>
+          <div class="stat-label">This month</div>
+          <div style="margin-top: 1rem;">
+            <div><i class="fas fa-calendar-day"></i> Today: $1,240</div>
+            <div><i class="fas fa-calendar-week"></i> Week: $7,850</div>
+          </div>
+        </div>
+        
+        <!-- Performance Metrics -->
+        <div class="card">
+          <h3><i class="fas fa-chart-pie"></i> Performance Metrics</h3>
+          <div style="margin-top: 1rem;">
+            <div><i class="fas fa-clock"></i> On-time Delivery: 92%</div>
+            <div><i class="fas fa-star"></i> Customer Satisfaction: 94%</div>
+            <div><i class="fas fa-truck-loading"></i> Capacity Utilization: 78%</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Active Shipments -->
+      <div class="card" style="margin-top: 2rem;">
+        <h3><i class="fas fa-shipping-fast"></i> Active Shipments</h3>
+        <div id="map-container">
+          <div class="map-placeholder">
+            <p><i class="fas fa-map-marked-alt"></i> Map view with live tracking would appear here</p>
+          </div>
+        </div>
+        
+        <div class="search-container">
+          <input type="text" class="search-input" placeholder="Search by tracking number...">
+          <button class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+        </div>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>Tracking #</th>
+              <th>Origin</th>
+              <th>Destination</th>
+              <th>Status</th>
+              <th>Est. Delivery</th>
+              <th>Last Checkpoint</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>CMS12345678</td>
+              <td>New York</td>
+              <td>Los Angeles</td>
+              <td><span class="status status-in-transit">In Transit</span></td>
+              <td>Jun 18, 2023</td>
+              <td>Chicago - Departed</td>
+              <td><button class="btn btn-primary" style="padding: 0.3rem 0.5rem;"><i class="fas fa-eye"></i></button></td>
+            </tr>
+            <tr>
+              <td>CMS87654321</td>
+              <td>Miami</td>
+              <td>Seattle</td>
+              <td><span class="status status-delivered">Delivered</span></td>
+              <td>Jun 15, 2023</td>
+              <td>Seattle - Delivered</td>
+              <td><button class="btn btn-primary" style="padding: 0.3rem 0.5rem;"><i class="fas fa-eye"></i></button></td>
+            </tr>
+            <tr>
+              <td>CMS13579246</td>
+              <td>Houston</td>
+              <td>Boston</td>
+              <td><span class="status status-delayed">Delayed</span></td>
+              <td>Jun 17, 2023</td>
+              <td>Memphis - Weather Delay</td>
+              <td><button class="btn btn-primary" style="padding: 0.3rem 0.5rem;"><i class="fas fa-eye"></i></button></td>
+            </tr>
+            <tr>
+              <td>CMS24681357</td>
+              <td>Chicago</td>
+              <td>Denver</td>
+              <td><span class="status status-warehouse">In Warehouse</span></td>
+              <td>Jun 19, 2023</td>
+              <td>Chicago - Sorting</td>
+              <td><button class="btn btn-primary" style="padding: 0.3rem 0.5rem;"><i class="fas fa-eye"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Add Cargo View -->
+    <section id="addCargo" class="view">
+      <h2><i class="fas fa-plus-circle"></i> Add New Cargo</h2>
+      <div class="card">
+        <form id="cargoForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="shipper"><i class="fas fa-user-tie"></i> Shipper Name</label>
+              <input type="text" id="shipper" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="consignee"><i class="fas fa-user"></i> Consignee Name</label>
+              <input type="text" id="consignee" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="origin"><i class="fas fa-map-marker-alt"></i> Origin</label>
+              <input type="text" id="origin" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="destination"><i class="fas fa-map-marker-alt"></i> Destination</label>
+              <input type="text" id="destination" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="weight"><i class="fas fa-weight-hanging"></i> Weight (kg)</label>
+              <input type="number" id="weight" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="dimensions"><i class="fas fa-ruler-combined"></i> Dimensions (LxWxH)</label>
+              <input type="text" id="dimensions" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="shipmentType"><i class="fas fa-shipping-fast"></i> Shipment Type</label>
+              <select id="shipmentType" class="form-control" required>
+                <option value="">Select type</option>
+                <option value="air">Air Freight</option>
+                <option value="sea">Sea Freight</option>
+                <option value="land">Land Freight</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="priority"><i class="fas fa-exclamation-circle"></i> Priority</label>
+              <select id="priority" class="form-control" required>
+                <option value="standard">Standard</option>
+                <option value="express">Express</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+              <label for="description"><i class="fas fa-align-left"></i> Description</label>
+              <textarea id="description" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+              <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Create Shipment</button>
+              <button type="reset" class="btn btn-secondary"><i class="fas fa-undo"></i> Reset</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- View Cargo View -->
+    <section id="viewCargo" class="view">
+      <h2><i class="fas fa-list"></i> View Cargo</h2>
+      <div class="card">
+        <div class="search-container">
+          <input type="text" class="search-input" placeholder="Search shipments...">
+          <button class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+          <button class="btn btn-secondary"><i class="fas fa-filter"></i> Filters</button>
+        </div>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>Tracking #</th>
+              <th>Shipper</th>
+              <th>Consignee</th>
+              <th>Origin</th>
+              <th>Destination</th>
+              <th>Status</th>
+              <th>Est. Delivery</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>CMS12345678</td>
+              <td>ABC Corp</td>
+              <td>XYZ Ltd</td>
+              <td>New York</td>
+              <td>Los Angeles</td>
+              <td><span class="status status-in-transit">In Transit</span></td>
+              <td>Jun 18, 2023</td>
+              <td>
+                <button class="btn btn-primary" style="padding: 0.3rem 0.5rem;"><i class="fas fa-eye"></i></button>
+                <button class="btn btn-warning" style="padding: 0.3rem 0.5rem;"><i class="fas fa-edit"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>CMS87654321</td>
+              <td>Global Inc</td>
+              <td>Tech Solutions</td>
+              <td>Miami</td>
+              <td>Seattle</td>
+              <td><span class="status status-delivered">Delivered</span></td>
+              <td>Jun 15, 2023</td>
+              <td>
+                <button class="btn btn-primary" style="padding: 0.3rem 0.5rem;"><i class="fas fa-eye"></i></button>
+                <button class="btn btn-warning" style="padding: 0.3rem 0.5rem;"><i class="fas fa-edit"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>CMS13579246</td>
+              <td>Logistics Co</td>
+              <td>Retail Group</td>
+              <td>Houston</td>
+              <td>Boston</td>
+              <td><span class="status status-delayed">Delayed</span></td>
+              <td>Jun 17, 2023</td>
+              <td>
+                <button class="btn btn-primary" style="padding: 0.3rem 0.5rem;"><i class="fas fa-eye"></i></button>
+                <button class="btn btn-warning" style="padding: 0.3rem 0.5rem;"><i class="fas fa-edit"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>CMS24681357</td>
+              <td>Manufacturing Inc</td>
+              <td>Distributors LLC</td>
+              <td>Chicago</td>
+              <td>Denver</td>
+              <td><span class="status status-warehouse">In Warehouse</span></td>
+              <td>Jun 19, 2023</td>
+              <td>
+                <button class="btn btn-primary" style="padding: 0.3rem 0.5rem;"><i class="fas fa-eye"></i></button>
+                <button class="btn btn-warning" style="padding: 0.3rem 0.5rem;"><i class="fas fa-edit"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Track Shipment View -->
+    <section id="trackShipment" class="view">
+      <h2><i class="fas fa-search-location"></i> Track Shipment</h2>
+      <div class="card">
+        <div class="search-container">
+          <input type="text" class="search-input" placeholder="Enter tracking number..." id="trackingNumber">
+          <button class="btn btn-primary" onclick="trackShipment()"><i class="fas fa-search"></i> Track</button>
+        </div>
+        
+        <div id="trackingResult" style="margin-top: 2rem; display: none;">
+          <h3><i class="fas fa-box-open"></i> Shipment Details</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+            <div>
+              <p><strong><i class="fas fa-barcode"></i> Tracking Number:</strong> <span id="resultTrackingNo">CMS12345678</span></p>
+              <p><strong><i class="fas fa-map-marker-alt"></i> Origin:</strong> <span id="resultOrigin">New York</span></p>
+              <p><strong><i class="fas fa-map-marker-alt"></i> Destination:</strong> <span id="resultDestination">Los Angeles</span></p>
+              <p><strong><i class="fas fa-weight-hanging"></i> Weight:</strong> <span id="resultWeight">45 kg</span></p>
+            </div>
+            <div>
+              <p><strong><i class="fas fa-info-circle"></i> Status:</strong> <span id="resultStatus" class="status status-in-transit">In Transit</span></p>
+              <p><strong><i class="fas fa-calendar-check"></i> Estimated Delivery:</strong> <span id="resultEstDelivery">Jun 18, 2023</span></p>
+              <p><strong><i class="fas fa-truck"></i> Carrier:</strong> <span id="resultCarrier">Global Logistics</span></p>
+              <p><strong><i class="fas fa-shipping-fast"></i> Shipment Type:</strong> <span id="resultType">Air Freight</span></p>
+            </div>
+          </div>
+          
+          <h3 style="margin-top: 2rem;"><i class="fas fa-history"></i> Tracking History</h3>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-date">Jun 16, 2023 14:30</div>
+              <div class="timeline-content">Chicago - Departed from facility</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-date">Jun 16, 2023 08:15</div>
+              <div class="timeline-content">Chicago - Arrived at sorting facility</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-date">Jun 15, 2023 22:45</div>
+              <div class="timeline-content">New York - Departed origin facility</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-date">Jun 15, 2023 18:30</div>
+              <div class="timeline-content">New York - Shipment received</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Warehouse View -->
+    <section id="warehouse" class="view">
+      <h2><i class="fas fa-warehouse"></i> Warehouse Management</h2>
+      
+      <div class="dashboard-grid">
+        <div class="card stat-card">
+          <h3><i class="fas fa-boxes"></i> Current Inventory</h3>
+          <div class="stat-value">1,245</div>
+          <div class="stat-label">Items in stock</div>
+        </div>
+        
+        <div class="card stat-card">
+          <h3><i class="fas fa-percentage"></i> Capacity Utilization</h3>
+          <div class="stat-value">78%</div>
+          <div class="stat-label">22% available</div>
+        </div>
+        
+        <div class="card stat-card">
+          <h3><i class="fas fa-exclamation"></i> Low Stock</h3>
+          <div class="stat-value">24</div>
+          <div class="stat-label">Items need restock</div>
+        </div>
+      </div>
+      
+      <div class="card" style="margin-top: 2rem;">
+        <h3><i class="fas fa-exchange-alt"></i> Inbound/Outbound</h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+          <div>
+            <h4><i class="fas fa-arrow-down"></i> Expected Arrivals</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Expected</th>
+                  <th>From</th>
+                  <th>Items</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>WH123</td>
+                  <td>Jun 17</td>
+                  <td>New York</td>
+                  <td>45</td>
+                </tr>
+                <tr>
+                  <td>WH124</td>
+                  <td>Jun 18</td>
+                  <td>Miami</td>
+                  <td>32</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div>
+            <h4><i class="fas fa-arrow-up"></i> Scheduled Dispatches</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Scheduled</th>
+                  <th>To</th>
+                  <th>Items</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>WH125</td>
+                  <td>Jun 17</td>
+                  <td>Los Angeles</td>
+                  <td>28</td>
+                </tr>
+                <tr>
+                  <td>WH126</td>
+                  <td>Jun 18</td>
+                  <td>Chicago</td>
+                  <td>36</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card" style="margin-top: 2rem;">
+        <h3><i class="fas fa-box-open"></i> Inventory Overview</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Item ID</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Quantity</th>
+              <th>Location</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ITM001</td>
+              <td>Electronics Components</td>
+              <td>Electronics</td>
+              <td>120</td>
+              <td>A12-4</td>
+              <td><span class="status status-success">In Stock</span></td>
+            </tr>
+            <tr>
+              <td>ITM002</td>
+              <td>Packaging Materials</td>
+              <td>Supplies</td>
+              <td>45</td>
+              <td>B05-2</td>
+              <td><span class="status status-warning">Low Stock</span></td>
+            </tr>
+            <tr>
+              <td>ITM003</td>
+              <td>Textile Products</td>
+              <td>Apparel</td>
+              <td>210</td>
+              <td>C08-7</td>
+              <td><span class="status status-success">In Stock</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Notifications View -->
+    <section id="notifications" class="view">
+      <h2><i class="fas fa-bell"></i> Notification Center</h2>
+      
+      <div class="card">
+        <h3><i class="fas fa-exclamation-circle"></i> Alerts</h3>
+        
+        <div class="notification-item alert">
+          <div class="notification-icon"><i class="fas fa-exclamation-triangle"></i></div>
+          <div class="notification-content">
+            <strong>Shipment Delay</strong>
+            <p>Shipment CMS13579246 delayed due to weather conditions in Memphis area.</p>
+            <div class="notification-time">10 minutes ago</div>
+          </div>
+        </div>
+        
+        <div class="notification-item alert">
+          <div class="notification-icon"><i class="fas fa-passport"></i></div>
+          <div class="notification-content">
+            <strong>Customs Clearance Required</strong>
+            <p>Shipment CMS98765432 requires customs documentation for international delivery.</p>
+            <div class="notification-time">2 hours ago</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card" style="margin-top: 2rem;">
+        <h3><i class="fas fa-clock"></i> Reminders</h3>
+        
+        <div class="notification-item">
+          <div class="notification-icon"><i class="fas fa-truck-pickup"></i></div>
+          <div class="notification-content">
+            <strong>Scheduled Pickup</strong>
+            <p>Pickup scheduled for tomorrow at ABC Corp warehouse at 10:00 AM.</p>
+            <div class="notification-time">Today</div>
+          </div>
+        </div>
+        
+        <div class="notification-item">
+          <div class="notification-icon"><i class="fas fa-file-contract"></i></div>
+          <div class="notification-content">
+            <strong>Contract Renewal</strong>
+            <p>Contract with Global Logistics expiring in 15 days.</p>
+            <div class="notification-time">Yesterday</div>
+          </div>
+        </div>
+        
+        <div class="notification-item">
+          <div class="notification-icon"><i class="fas fa-money-bill-wave"></i></div>
+          <div class="notification-content">
+            <strong>Payment Due</strong>
+            <p>Invoice #INV-2023-056 payment due in 3 days.</p>
+            <div class="notification-time">2 days ago</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Show the specified view and hide others
+    function showView(viewId) {
+      // Hide all views
+      document.querySelectorAll('.view').forEach(view => {
+        view.classList.remove('active');
+      });
+      
+      // Show the selected view
+      document.getElementById(viewId).classList.add('active');
+      
+      // Update active nav link
+      document.querySelectorAll('nav a').forEach(link => {
+        link.classList.remove('active');
+      });
+      document.querySelector(`nav a[onclick="showView('${viewId}')"]`).classList.add('active');
+    }
+    
+    // Track shipment function
+    function trackShipment() {
+      const trackingNumber = document.getElementById('trackingNumber').value.trim();
+      if (trackingNumber) {
+        // In a real app, you would make an API call here with the tracking number
+        // For demo, we'll just show the result with sample data
+        document.getElementById('trackingResult').style.display = 'block';
+        
+        // Update tracking info (in a real app, this would come from the API response)
+        document.getElementById('resultTrackingNo').textContent = trackingNumber;
+        
+        // Here you would update all the fields with actual data from your backend
+      } else {
+        alert('Please enter a tracking number');
+      }
+    }
+    
+    // Form submission handler
+    document.getElementById('cargoForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Get form values
+      const shipper = document.getElementById('shipper').value;
+      const consignee = document.getElementById('consignee').value;
+      const origin = document.getElementById('origin').value;
+      const destination = document.getElementById('destination').value;
+      
+      // In a real app, you would send this data to your backend
+      console.log('New shipment:', {
+        shipper,
+        consignee,
+        origin,
+        destination,
+        weight: document.getElementById('weight').value,
+        dimensions: document.getElementById('dimensions').value,
+        shipmentType: document.getElementById('shipmentType').value,
+        priority: document.getElementById('priority').value,
+        description: document.getElementById('description').value
+      });
+      
+      alert('Shipment created successfully!');
+      
+      // Reset form
+      this.reset();
+      
+      // Return to dashboard
+      showView('dashboard');
+    });
+    
+    // Initialize the dashboard view
+    document.addEventListener('DOMContentLoaded', function() {
+      showView('dashboard');
+    });
+  </script>
+</body>
+</html>
